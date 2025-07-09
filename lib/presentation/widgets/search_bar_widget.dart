@@ -1,9 +1,17 @@
 import 'package:book_finder/core/core.dart';
+import 'package:book_finder/presentation/presentation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class SearchBarWidget extends StatelessWidget {
+class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({super.key});
 
+  @override
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -22,11 +30,28 @@ class SearchBarWidget extends StatelessWidget {
           ],
         ),
         child: TextField(
+          controller: _searchController,
+          onSubmitted: (val) {
+            if (val.length > 4) {
+              Provider.of<SearchBookProvider>(
+                context,
+                listen: false,
+              ).fetchBooks(val);
+            }
+          },
           decoration: InputDecoration(
             hintText: searchTitle,
             hintStyle: TextStyle(color: kcMediumGrey),
             prefixIcon: Icon(Icons.search, color: kcMediumGrey),
-            suffixIcon: Icon(Icons.mic, color: kcMediumGrey),
+            suffixIcon: IconButton(
+              onPressed: () {
+                Provider.of<SearchBookProvider>(
+                  context,
+                  listen: false,
+                ).fetchBooks(_searchController.text);
+              },
+              icon: Icon(Icons.arrow_forward, color: kcMediumGrey),
+            ),
             border: InputBorder.none,
             contentPadding: EdgeInsets.symmetric(vertical: 14.0),
           ),
@@ -34,5 +59,11 @@ class SearchBarWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchController.dispose();
   }
 }
