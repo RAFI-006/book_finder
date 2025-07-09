@@ -1,7 +1,7 @@
 import 'package:book_finder/domain/domain.dart';
 import 'package:flutter/material.dart';
 
-enum BookState { initial, loading, loaded, error }
+enum BookState { initial, loading, loaded, error, onScroll }
 
 class SearchBookProvider extends ChangeNotifier {
   ///Injecting all the use case
@@ -33,7 +33,8 @@ class SearchBookProvider extends ChangeNotifier {
 
   ///Pagination Part
   int _currentPage = 1;
-  String _currentQuery = '';
+  String currentQuery = '';
+
   bool _hasMore = true;
   bool get hasMore => _hasMore;
 
@@ -54,15 +55,17 @@ class SearchBookProvider extends ChangeNotifier {
       return; // No more data to load
     }
 
-    if (_currentQuery != query) {
+    if (currentQuery != query) {
       _currentPage = 1;
       _books = [];
       _hasMore = true;
-      _currentQuery = query;
+      currentQuery = query;
     }
 
-    _viewState = BookState.loading;
-    notifyListeners();
+    if (_currentPage == 1) {
+      _viewState = BookState.loading;
+      notifyListeners();
+    }
 
     try {
       final newBooks = await searchBooks.call(query, _currentPage);
@@ -72,6 +75,7 @@ class SearchBookProvider extends ChangeNotifier {
         _books.addAll(newBooks);
         _currentPage++;
       }
+
       _viewState = BookState.loaded;
     } catch (e) {
       _errorMessage = e.toString();
@@ -83,6 +87,8 @@ class SearchBookProvider extends ChangeNotifier {
 
   void loadMoreBooks(String query) {
     if (_viewState != BookState.loading && _hasMore) {
+      _viewState = BookState.onScroll;
+      notifyListeners();
       fetchBooks(query);
     }
   }

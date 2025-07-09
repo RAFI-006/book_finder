@@ -13,7 +13,6 @@ class BookTileWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-
         MaterialPageRoute(builder: (context) => BookDetailsScreen(book: book)),
       ),
       child: Card(
@@ -27,7 +26,7 @@ class BookTileWidget extends StatelessWidget {
             Card(
               clipBehavior: Clip.antiAlias,
               child: CachedNetworkImage(
-                imageUrl: book.coverImageUrl!,
+                imageUrl: book.coverImageUrl ?? '',
                 placeholder: (_, __) => Container(color: Colors.blueGrey),
                 errorWidget: (_, __, ____) => Container(color: Colors.grey),
                 width: 160,

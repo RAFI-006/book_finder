@@ -14,6 +14,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<SearchBookProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
@@ -32,12 +33,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         child: TextField(
           controller: _searchController,
           onSubmitted: (val) {
-            if (val.length > 4) {
-              Provider.of<SearchBookProvider>(
-                context,
-                listen: false,
-              ).fetchBooks(val);
-            }
+            provider.currentQuery = val;
+            provider.fetchBooks(val, isRefresh: true);
           },
           decoration: InputDecoration(
             hintText: searchTitle,
@@ -45,10 +42,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             prefixIcon: Icon(Icons.search, color: kcMediumGrey),
             suffixIcon: IconButton(
               onPressed: () {
-                Provider.of<SearchBookProvider>(
-                  context,
-                  listen: false,
-                ).fetchBooks(_searchController.text);
+                provider.currentQuery = _searchController.text;
+                provider.fetchBooks(_searchController.text, isRefresh: true);
               },
               icon: Icon(Icons.arrow_forward, color: kcMediumGrey),
             ),

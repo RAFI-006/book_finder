@@ -1,6 +1,7 @@
 import 'package:book_finder/core/locators.dart' as di;
 import 'package:book_finder/presentation/presentation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -18,9 +19,7 @@ class MyApp extends StatelessWidget {
       create: (_) => di.sl<SearchBookProvider>(),
       child: MaterialApp(
         title: 'Book Search App',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
-        ),
+
         home: const SearchBookScreen(),
       ),
     );
