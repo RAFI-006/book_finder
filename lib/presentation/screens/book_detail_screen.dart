@@ -4,7 +4,6 @@ import 'package:book_finder/presentation/presentation.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:math' as math;
-
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -25,51 +24,53 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<SearchBookProvider>(
         context,
         listen: false,
       ).fetchBookDetails(widget.book.id);
     });
+
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2), // Duration of the rotation
+      duration: const Duration(seconds: 2),
     );
 
-    _animation = Tween<double>(begin: 0, end: 2 * math.pi).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutCubic, // Smooth animation curve
-      ),
-    );
+    _animation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.0, end: math.pi), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: math.pi, end: 0.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
-    // Start the animation when the widget is initialized
     _animationController.forward();
   }
 
   @override
   void dispose() {
-    _animationController
-        .dispose(); // Dispose the controller to prevent memory leaks
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var watcher = Provider.of<SearchBookProvider>(context, listen: true);
+
     return SafeArea(
-      bottom: true,
-      top: true,
       child: Scaffold(
         bottomSheet: GestureDetector(
           onTap: () => Provider.of<SearchBookProvider>(context, listen: false)
               .saveBookToLocal(widget.book)
-              .then((onValue) {
+              .then((_) {
                 Navigator.pushAndRemoveUntil(
                   context,
-
                   MaterialPageRoute(builder: (context) => SearchBookScreen()),
-                  (Route<dynamic> route) => false,
+                  (route) => false,
                 );
               }),
           child: Container(
@@ -90,41 +91,38 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
             icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () => Navigator.pop(context),
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Icon(Icons.favorite, color: Colors.red[700], size: 30),
-            ),
-          ],
         ),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              // Book Cover Image with Rotation Animation
               AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
-                  return Transform.rotate(
-                    angle: _animation.value,
+                  final angle = _animation.value;
+
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001)
+                      ..rotateY(angle),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: CachedNetworkImage(
-                        imageUrl: widget.book.coverImageUrl!,
+                        imageUrl: widget.book.coverImageUrl ?? '',
                         width: MediaQuery.of(context).size.width * 0.6,
                         fit: BoxFit.cover,
                         placeholder: (_, __) =>
-                            Container(color: Colors.blueGrey),
-                        errorWidget: (_, __, ____) =>
-                            Container(color: Colors.grey),
+                            Container(height: 200, color: Colors.blueGrey),
+                        errorWidget: (_, __, ___) =>
+                            Container(height: 200, color: Colors.grey),
                       ),
                     ),
                   );
                 },
               ),
               const SizedBox(height: 20),
-              // Book Title and Series
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -141,28 +139,26 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
-
               Text(
                 widget.book.author,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
               const SizedBox(height: 20),
-              // Rating
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: _buildStarRating(5),
               ),
               const SizedBox(height: 5),
-              // Rating Details
               Text(
                 'Publishing year · ${widget.book.firstPublishYear} year.',
-                textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 32),
-              // Book Description
-              if (watcher.viewState == BookState.loading) ...{
+              if (watcher.viewState == BookState.loading)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Shimmer.fromColors(
@@ -170,22 +166,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                     highlightColor: Colors.grey[100]!,
                     child: Text(shimmerDummyText),
                   ),
-                ),
-              } else ...{
+                )
+              else
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Text(
-                    Provider.of<SearchBookProvider>(
-                          context,
-                          listen: false,
-                        ).selectedBookDetails?.description ??
-                        '',
+                    watcher.selectedBookDetails?.description ?? '',
                     textAlign: TextAlign.justify,
                     style: descTextStyle,
                   ),
                 ),
-              },
-              const SizedBox(height: 80), // Spacing at the bottom
+              const SizedBox(height: 80),
             ],
           ),
         ),
