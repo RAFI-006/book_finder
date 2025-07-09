@@ -14,6 +14,14 @@ class _SearchBookState extends State<SearchBookScreen> {
   late SearchBookProvider _watcher;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SearchBookProvider>(context, listen: false).fetchSavedBooks();
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _watcher = context.watch<SearchBookProvider>();
@@ -40,6 +48,7 @@ class _SearchBookState extends State<SearchBookScreen> {
                 child: Text(searchResult, style: mediumTextStyle),
               ),
               SizedBox(height: 16),
+
               Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: _watcher.viewState == BookState.loading

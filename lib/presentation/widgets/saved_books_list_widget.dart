@@ -1,6 +1,7 @@
 import 'package:book_finder/domain/domain.dart';
 import 'package:book_finder/presentation/presentation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 class SavedBookListWidget extends StatelessWidget {
   const SavedBookListWidget({super.key});
@@ -10,11 +11,17 @@ class SavedBookListWidget extends StatelessWidget {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.6,
       child: ListView.builder(
-        itemCount: 4,
+        itemCount: Provider.of<SearchBookProvider>(
+          context,
+          listen: false,
+        ).savedBooks.length,
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, idx) => BookTileWidget(
-          book: BookEntity(id: '', title: '', author: ''),
+          book: Provider.of<SearchBookProvider>(
+            context,
+            listen: false,
+          ).savedBooks[idx],
         ),
       ),
     );

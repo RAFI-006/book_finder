@@ -9,12 +9,19 @@ final sl = GetIt.instance;
 Future<void> init() async {
   // Presentation
   sl.registerFactory(
-    () => SearchBookProvider(searchBooks: sl(), getBookDetails: sl()),
+    () => SearchBookProvider(
+      searchBooks: sl(),
+      getBookDetails: sl(),
+      saveBook: sl(),
+      getSavedBooks: sl(),
+    ),
   );
 
   // Use cases
   sl.registerLazySingleton(() => SearchBooks(sl()));
   sl.registerLazySingleton(() => GetBookDetails(sl()));
+  sl.registerLazySingleton(() => SaveBook(sl()));
+  sl.registerLazySingleton(() => GetSavedBooks(sl()));
 
   // Repository
   sl.registerLazySingleton<BookRepository>(

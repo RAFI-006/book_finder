@@ -4,9 +4,17 @@ import 'package:flutter/material.dart';
 enum BookState { initial, loading, loaded, error }
 
 class SearchBookProvider extends ChangeNotifier {
+  ///Injecting all the use case
   final SearchBooks searchBooks;
   final GetBookDetails getBookDetails;
-  SearchBookProvider({required this.searchBooks, required this.getBookDetails});
+  final SaveBook saveBook;
+  final GetSavedBooks getSavedBooks;
+  SearchBookProvider({
+    required this.searchBooks,
+    required this.getBookDetails,
+    required this.getSavedBooks,
+    required this.saveBook,
+  });
 
   BookState _viewState = BookState.initial;
   BookState get viewState => _viewState;
@@ -91,6 +99,26 @@ class SearchBookProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _viewState = BookState.error;
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> saveBookToLocal(BookEntity book) async {
+    try {
+      await saveBook.call(book);
+      await fetchSavedBooks(); // Refresh saved books list
+    } catch (e) {
+      _errorMessage = 'Failed to save book: $e';
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchSavedBooks() async {
+    try {
+      _savedBooks = await getSavedBooks.call();
+    } catch (e) {
+      _errorMessage = 'Failed to fetch saved books: $e';
     } finally {
       notifyListeners();
     }

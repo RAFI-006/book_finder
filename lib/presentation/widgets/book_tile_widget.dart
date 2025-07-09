@@ -59,7 +59,7 @@ class BookTileWidget extends StatelessWidget {
                   SizedBox(
                     width: 160,
                     child: Text(
-                      book.author,
+                      book.title,
                       style: TextStyle(
                         fontSize: 16.0,
                         overflow: TextOverflow.ellipsis,

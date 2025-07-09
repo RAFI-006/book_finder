@@ -61,13 +61,25 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
       bottom: true,
       top: true,
       child: Scaffold(
-        bottomSheet: Container(
-          height: 56,
-          color: Colors.black87,
-          child: Center(
-            child: Text(
-              'Save this book',
-              style: mediumTextStyle.copyWith(color: Colors.white),
+        bottomSheet: GestureDetector(
+          onTap: () => Provider.of<SearchBookProvider>(context, listen: false)
+              .saveBookToLocal(widget.book)
+              .then((onValue) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+
+                  MaterialPageRoute(builder: (context) => SearchBookScreen()),
+                  (Route<dynamic> route) => false,
+                );
+              }),
+          child: Container(
+            height: 56,
+            color: Colors.black87,
+            child: Center(
+              child: Text(
+                saveThisBook,
+                style: mediumTextStyle.copyWith(color: Colors.white),
+              ),
             ),
           ),
         ),
@@ -156,7 +168,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   child: Shimmer.fromColors(
                     baseColor: Colors.grey[300]!,
                     highlightColor: Colors.grey[100]!,
-                    child: Flexible(child: Text(shimmerDummyText)),
+                    child: Text(shimmerDummyText),
                   ),
                 ),
               } else ...{
@@ -173,7 +185,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen>
                   ),
                 ),
               },
-              const SizedBox(height: 32), // Spacing at the bottom
+              const SizedBox(height: 80), // Spacing at the bottom
             ],
           ),
         ),
