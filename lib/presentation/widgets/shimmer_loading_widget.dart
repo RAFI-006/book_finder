@@ -21,7 +21,7 @@ class ShimmerLoadingWidget extends StatelessWidget {
             child: BookTileWidget(
               book: BookEntity(
                 id: '',
-                title: 'jk rowling',
+                title: 'Harry potter',
                 author: 'jk rowling',
                 coverImageUrl:
                     'https://covers.openlibrary.org/b/id/14627060-L.jpg',
