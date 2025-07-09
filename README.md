@@ -121,6 +121,19 @@ flutter run
 
 ## 📸 Screenshots
 
+### 🔍 Book Search UI
+![Search Book UI](./search_book.jpeg)
+
+### 📖 Book Details UI
+![Book Details UI](./book_detail.jpeg)
+
+### ✨ Shimmer Loading Animation
+![Shimmer UI](./search_shimmer.jpeg)
+
+### ❌ Empty State
+![Empty State UI](./empty_state.png)
+
+
 | Search Screen                            | Book Details Screen                        |
 |------------------------------------------|--------------------------------------------|
 | ![Search](screenshots/search_screen.png) | ![Details](screenshots/book_details.png)   |
